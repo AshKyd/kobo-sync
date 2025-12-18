@@ -1,10 +1,16 @@
-import 'dotenv/config';
-
 /**
  * 1. Find Hardcover IDs using ISBN
  */
-async function getHardcoverIds(isbn) {
+async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
   if (!isbn || isbn === "No ISBN") return null;
+
+  // Validate API parameters
+  if (!apiToken) {
+    throw new Error("API token is required");
+  }
+  if (!apiUrl) {
+    throw new Error("API URL is required");
+  }
 
   const query = `
     query findById($isbn: String!) {
@@ -20,13 +26,22 @@ async function getHardcoverIds(isbn) {
   const fetchOptions = {
     method: "POST",
     headers: {
-      Authorization: 'Bearer '+process.env.HARDCOVER_API_TOKEN, // Usually 'Bearer <token>' depending on your env setup
+      Authorization: 'Bearer ' + apiToken,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables: { isbn } }),
   }
-  console.log(fetchOptions)
-  const response = await fetch(process.env.HARDCOVER_API_URL, fetchOptions);
+  
+  let response;
+  try {
+    response = await fetch(apiUrl, fetchOptions);
+  } catch (error) {
+    throw new Error(`Failed to connect to API: ${error.message}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+  }
 
   const json = await response.json();
   if(json.errors){
@@ -41,8 +56,20 @@ async function getHardcoverIds(isbn) {
 /**
  * 2. Sync Annotation
  */
-export default async function syncAnnotation(koboAnnotation) {
-  const ids = await getHardcoverIds(koboAnnotation.isbn);
+export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl }) {
+  // Validate required parameters
+  if (!apiToken) {
+    throw new Error("API token is required");
+  }
+  if (!apiUrl) {
+    throw new Error("API URL is required");
+  }
+  
+  if (!koboAnnotation) {
+    throw new Error("Kobo annotation is required");
+  }
+  
+  const ids = await getHardcoverIds(koboAnnotation.isbn, { apiToken, apiUrl });
 
   if (!ids) {
     console.error(`Skipping: No book found for ISBN ${koboAnnotation.isbn}`);
@@ -57,21 +84,21 @@ export default async function syncAnnotation(koboAnnotation) {
   const mutation = `
     mutation postquote($bookId: Int!, $editionId: Int!, $entry: String!, $event: String!) {
       insert_reading_journal(object: {
-        privacy_setting_id: 1, 
-        book_id: $bookId, 
-        edition_id: $editionId, 
-        event: $event, 
-        tags: {spoiler: false, category: "quote", tag: ""}, 
+        privacy_setting_id: 1,
+        book_id: $bookId,
+        edition_id: $editionId,
+        event: $event,
+        tags: {spoiler: false, category: "quote", tag: ""},
         entry: $entry
       }) {
         id
       }
     }`;
 
-  const response = await fetch(process.env.HARDCOVER_API_URL, {
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
-      Authorization: 'Bearer '+process.env.HARDCOVER_API_TOKEN,
+      Authorization: 'Bearer ' + apiToken,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -84,6 +111,10 @@ export default async function syncAnnotation(koboAnnotation) {
       },
     }),
   });
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+  }
 
   return await response.json();
 }

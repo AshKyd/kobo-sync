@@ -36,7 +36,8 @@
     "time": "2025-12-07T12:49:28.942",
     "chapter": "xhtml/23_Chapter_12_Plundered_.xhtml",
     "annotation": "",
-    "highlightedText": "In one paper, together with Hugging Face machine learning and society lead Yacine Jernite, the two measured the carbon footprint of running open-source generative AI models as a proxy to what closed companies are building. They found that producing one thousand pieces of text from generative models used as much energy on average as what it would take to charge the standard smartphone nearly four times. Generating one thousand images used on average as much energy as 242 full smartphone charges; in other words, every AI-generated image could consume enough energy to charge a smartphone by roughly 25 percent."
+    "highlightedText": "In one paper, together with Hugging Face machine learning and society lead Yacine Jernite, the two measured the carbon footprint of running open-source generative AI models as a proxy to what closed companies are building. They found that producing one thousand pieces of text from generative models used as much energy on average as what it would take to charge the standard smartphone nearly four times. Generating one thousand images used on average as much energy as 242 full smartphone charges; in other words, every AI-generated image could consume enough energy to charge a smartphone by roughly 25 percent.",
+    "synced": true
   },
   {
     "id": "ecfc16e1-d502-4ea6-99db-1ac07b8c0aaa",
@@ -50,30 +51,33 @@
   },
   {
     "id": "2af22ec2-c41e-4581-92f6-081280da8a93",
-    "isbn": null,
+    "isbn": "9788427298033",
     "title": "And Then There Were None",
     "time": "2025-12-03T09:34:36.860",
     "chapter": "index_split_006.html",
     "annotation": "",
-    "highlightedText": "There were startled and shocked ejaculations."
+    "highlightedText": "There were startled and shocked ejaculations.",
+    "synced": true
   },
   {
     "id": "9d64d13a-664c-4f79-bee7-a70f1c27fcfc",
-    "isbn": null,
+    "isbn": "9788427298033",
     "title": "And Then There Were None",
     "time": "2025-12-03T09:30:30.561",
     "chapter": "index_split_006.html",
     "annotation": "",
-    "highlightedText": "They spoke instead in a desultory fashion of current events. The news from abroad, events in the world of sport, the latest reappearance of the Loch Ness monster.\n\t"
+    "highlightedText": "They spoke instead in a desultory fashion of current events. The news from abroad, events in the world of sport, the latest reappearance of the Loch Ness monster.\n\t",
+    "synced": true
   },
   {
     "id": "2ddc1204-28f6-428a-9889-19990bbc1aa3",
-    "isbn": null,
+    "isbn": "9788427298033",
     "title": "And Then There Were None",
     "time": "2025-12-01T13:28:36.065",
     "chapter": "index_split_002.html",
     "annotation": "",
-    "highlightedText": "Vera smiled. Of course! This was Indian Island!\n\t"
+    "highlightedText": "Vera smiled. Of course! This was Indian Island!\n\t",
+    "synced": true
   },
   {
     "id": "50e33801-0d21-495d-b7d0-c25f26b1cc24",

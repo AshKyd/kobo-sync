@@ -1,4 +1,3 @@
-import 'dotenv/config';
 /**
  * Normalizes strings by removing subtitles, punctuation, and extra whitespace.
  */
@@ -29,7 +28,7 @@ function findBookInLibrary(koboTitle, library) {
     
     // 1. Exact match gets top priority
     if (target === candidate) {
-      return item.book; 
+      return item.book;
     }
 
     // 2. Word-based intersection
@@ -55,7 +54,19 @@ function findBookInLibrary(koboTitle, library) {
 /**
  * Main Lookup function: fetches library, performs fuzzy match, and returns ISBN.
  */
-export default async function lookupISBN(koboAnnotation) {
+export default async function lookupISBN(koboAnnotation, { apiToken, apiUrl }) {
+  // Validate required parameters
+  if (!apiToken) {
+    throw new Error("API token is required");
+  }
+  if (!apiUrl) {
+    throw new Error("API URL is required");
+  }
+  
+  if (!koboAnnotation?.title) {
+    throw new Error("Kobo annotation title is required");
+  }
+
   const query = `
     query getMyLibrary {
       me {
@@ -73,40 +84,43 @@ export default async function lookupISBN(koboAnnotation) {
       }
     }`;
 
+  let response;
   try {
-    const response = await fetch(process.env.HARDCOVER_API_URL, {
+    response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.HARDCOVER_API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ query })
     });
+  } catch (error) {
+    throw new Error(`Failed to connect to API: ${error.message}`);
+  }
 
-    const result = await response.json();
-    const userBooks = result.data?.me?.[0]?.user_books || [];
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+  }
 
-    const matchedBook = findBookInLibrary(koboAnnotation.title, userBooks);
+  const result = await response.json();
+  const userBooks = result.data?.me?.[0]?.user_books || [];
 
-    if (!matchedBook) {
-      console.warn(`No confident match found for: "${koboAnnotation.title}"`);
-      return null;
-    }
+  const matchedBook = findBookInLibrary(koboAnnotation.title, userBooks);
 
-    // Prefer ISBN-13, fall back to ISBN-10
-    const primaryEdition = matchedBook.editions[0];
-    const foundIsbn = primaryEdition?.isbn_13 || primaryEdition?.isbn_10 || "No ISBN Found";
-
-    console.log(`Fuzzy matched "${koboAnnotation.title}" -> ISBN: ${foundIsbn}`);
-
-    return {
-      bookId: matchedBook.id,
-      editionId: primaryEdition?.id,
-      isbn: foundIsbn
-    };
-  } catch (err) {
-    console.error("Library lookup failed:", err.message);
-    throw err
+  if (!matchedBook) {
+    console.warn(`No confident match found for: "${koboAnnotation.title}"`);
     return null;
   }
+
+  // Prefer ISBN-13, fall back to ISBN-10
+  const primaryEdition = matchedBook.editions[0];
+  const foundIsbn = primaryEdition?.isbn_13 || primaryEdition?.isbn_10 || "No ISBN Found";
+
+  console.log(`Fuzzy matched "${koboAnnotation.title}" -> ISBN: ${foundIsbn}`);
+
+  return {
+    bookId: matchedBook.id,
+    editionId: primaryEdition?.id,
+    isbn: foundIsbn
+  };
 }

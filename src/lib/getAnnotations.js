@@ -44,27 +44,48 @@ function getAnnotations(db, since = '1970-01-01') {
   }
 }
 
-const db = new sqlite.DatabaseSync("/home/ash/KoboReader.sqlite");
+export default async function extractAnnotations({
+  dbPath = "",
+  outputFile = "",
+  since = "1970-01-01"
+}) {
+  // Validate required parameters
+  if (!dbPath) {
+    throw new Error("Database path is required");
+  }
+  
+  if (!outputFile) {
+    throw new Error("Output file path is required");
+  }
 
-const myNotes = getAnnotations(db);
+  let existingNotes = [];
+  try {
+    const fileContent = await fs.readFile(outputFile, 'utf8');
+    existingNotes = JSON.parse(fileContent);
+  } catch (error) {
+    // If file doesn't exist or is invalid, we'll start with an empty array
+    console.warn(`Could not read existing annotations file: ${error.message}. Starting fresh.`);
+  }
 
-const existingNotes = JSON.parse(fs.readFileSync('annotations.json', 'utf8'));
+  const db = new sqlite.DatabaseSync(dbPath);
+  const myNotes = getAnnotations(db, since);
 
+  // 3. Merge and De-duplicate
+  // We create a Map using the 'id' as the key.
+  // New notes will overwrite existing ones if the ID matches (useful if you updated a note).
+  const mergedMap = new Map();
 
-// 3. Merge and De-duplicate
-// We create a Map using the 'id' as the key. 
-// New notes will overwrite existing ones if the ID matches (useful if you updated a note).
-const mergedMap = new Map();
+  // Add new notes into the map (overwriting duplicates)
+  myNotes.forEach(note => mergedMap.set(note.id, note));
 
+  // Load old notes into the map
+  existingNotes.forEach(note => mergedMap.set(note.id, note));
 
-// Add new notes into the map (overwriting duplicates)
-myNotes.forEach(note => mergedMap.set(note.id, note));
-
-// Load old notes into the map
-existingNotes.forEach(note => mergedMap.set(note.id, note));
-
-
-// 4. Convert back to array and sort by time (newest first)
-const finalData = Array.from(mergedMap.values())
-  .sort((a, b) => new Date(b.time) - new Date(a.time));
-await fs.writeFile('annotations.json', JSON.stringify(finalData,null,2))
+  // 4. Convert back to array and sort by time (newest first)
+  const finalData = Array.from(mergedMap.values())
+    .sort((a, b) => new Date(b.time) - new Date(a.time));
+  
+  await fs.writeFile(outputFile, JSON.stringify(finalData, null, 2));
+  console.log(`Extracted ${myNotes.length} annotations and merged with existing data.`);
+  return finalData;
+}
