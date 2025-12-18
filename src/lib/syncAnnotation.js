@@ -1,16 +1,10 @@
+import hardcoverApiRequest from './hardcover.js';
+
 /**
  * 1. Find Hardcover IDs using ISBN
  */
 async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
   if (!isbn || isbn === "No ISBN") return null;
-
-  // Validate API parameters
-  if (!apiToken) {
-    throw new Error("API token is required");
-  }
-  if (!apiUrl) {
-    throw new Error("API URL is required");
-  }
 
   const query = `
     query findById($isbn: String!) {
@@ -22,34 +16,19 @@ async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
       }
     }`;
 
-  
-  const fetchOptions = {
-    method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + apiToken,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, variables: { isbn } }),
-  }
-  
-  let response;
-  try {
-    response = await fetch(apiUrl, fetchOptions);
-  } catch (error) {
-    throw new Error(`Failed to connect to API: ${error.message}`);
+  const result = await hardcoverApiRequest({
+    query,
+    variables: { isbn },
+    apiToken,
+    apiUrl
+  });
+
+  // If result is null, an error occurred and was already logged
+  if (result === null) {
+    throw new Error("Failed to fetch book IDs from Hardcover API");
   }
 
-  if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
-  }
-
-  const json = await response.json();
-  if(json.errors){
-    console.error(JSON.stringify(json.errors,null,2));
-    throw new Error('Hardcover returned API error')
-  }
-  const book = json.data?.books?.[0];
-
+  const book = result.data?.books?.[0];
   return book ? { bookId: book.id, editionId: book.editions[0].id } : null;
 }
 
@@ -57,14 +36,6 @@ async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
  * 2. Sync Annotation
  */
 export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl }) {
-  // Validate required parameters
-  if (!apiToken) {
-    throw new Error("API token is required");
-  }
-  if (!apiUrl) {
-    throw new Error("API URL is required");
-  }
-  
   if (!koboAnnotation) {
     throw new Error("Kobo annotation is required");
   }
@@ -72,7 +43,7 @@ export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl 
   const ids = await getHardcoverIds(koboAnnotation.isbn, { apiToken, apiUrl });
 
   if (!ids) {
-    console.error(`Skipping: No book found for ISBN ${koboAnnotation.isbn}`);
+    console.error(`Skipping: No book found for "${koboAnnotation.title}" ISBN ${koboAnnotation.isbn}`);
     return;
   }
 
@@ -95,26 +66,22 @@ export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl 
       }
     }`;
 
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + apiToken,
-      "Content-Type": "application/json",
+  const result = await hardcoverApiRequest({
+    query: mutation,
+    variables: {
+      bookId: ids.bookId,
+      editionId: ids.editionId,
+      entry: entryText,
+      event: isNote ? "annotation" : "quote",
     },
-    body: JSON.stringify({
-      query: mutation,
-      variables: {
-        bookId: ids.bookId,
-        editionId: ids.editionId,
-        entry: entryText,
-        event: isNote ? "annotation" : "quote",
-      },
-    }),
+    apiToken,
+    apiUrl
   });
 
-  if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+  // If result is null, an error occurred and was already logged
+  if (result === null) {
+    throw new Error("Failed to sync annotation with Hardcover API");
   }
 
-  return await response.json();
+  return result;
 }

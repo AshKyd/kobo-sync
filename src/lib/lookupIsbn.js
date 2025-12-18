@@ -1,3 +1,5 @@
+import hardcoverApiRequest from './hardcover.js';
+
 /**
  * Normalizes strings by removing subtitles, punctuation, and extra whitespace.
  */
@@ -55,14 +57,6 @@ function findBookInLibrary(koboTitle, library) {
  * Main Lookup function: fetches library, performs fuzzy match, and returns ISBN.
  */
 export default async function lookupISBN(koboAnnotation, { apiToken, apiUrl }) {
-  // Validate required parameters
-  if (!apiToken) {
-    throw new Error("API token is required");
-  }
-  if (!apiUrl) {
-    throw new Error("API URL is required");
-  }
-  
   if (!koboAnnotation?.title) {
     throw new Error("Kobo annotation title is required");
   }
@@ -84,25 +78,17 @@ export default async function lookupISBN(koboAnnotation, { apiToken, apiUrl }) {
       }
     }`;
 
-  let response;
-  try {
-    response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ query })
-    });
-  } catch (error) {
-    throw new Error(`Failed to connect to API: ${error.message}`);
+  const result = await hardcoverApiRequest({
+    query,
+    apiToken,
+    apiUrl
+  });
+
+  // If result is null, an error occurred and was already logged
+  if (result === null) {
+    throw new Error("Failed to fetch library from Hardcover API");
   }
 
-  if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
-  }
-
-  const result = await response.json();
   const userBooks = result.data?.me?.[0]?.user_books || [];
 
   const matchedBook = findBookInLibrary(koboAnnotation.title, userBooks);
