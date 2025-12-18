@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "commander": "^14.0.2",
-    "dotenv": "^17.2.3"
+    "conf": "^15.0.2"
   }
 }
