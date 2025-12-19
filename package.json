@@ -28,6 +28,9 @@
   ],
   "type": "module",
   "main": "src/index.js",
+  "bin": {
+    "kobo-sync": "src/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
