@@ -35,7 +35,7 @@ program
   });
 
 program
-  .command("read")
+  .command("device")
   .option('-i, --input <sqlite>','Kobo SQLite database', config.get('koboDbPath'))
   .option('-o, --out <json>','Path for the annotations.json file to create or update', config.get('annotationsFilePath'))
   .description("Read a Kobo sqlite database and extract all the annotations")
@@ -53,7 +53,7 @@ program
   });
 
 program
-  .command("send")
+  .command("hardcover")
   .option('-i, --input <json>','Path for the annotations.json file to send from', config.get('annotationsFilePath'))
   .option('-t, --token <token>', 'Hardcover API token', config.get('hardcoverApiToken'))
   .option('-a, --api <apiUrl>', 'Hardcover API url', config.get('hardcoverApiUrl'))
