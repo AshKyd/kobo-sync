@@ -4,30 +4,33 @@ import Conf from 'conf';
 import extractAnnotations from './lib/getAnnotations.js';
 import syncAllAnnotations from './lib/syncAll.js';
 import packageJson from '../package.json' with {type:'json'}
+import detectKoboEreaderPath from "./lib/detectKoboEreaderPath.js";
 
 const config = new Conf({projectName: packageJson.name});
 
+const ANNOTATION_PATH = config.get('annotationsFilePath')||'annotations.json'
+
 program
   .command("login")
-  .description("Set configuration values")
+  .description("Set configuration values (or blank string to reset)")
   .option('-d, --db <path>', 'Kobo SQLite database path')
   .option('-j, --json <path>', 'Path for the annotations.json file')
   .option('-t, --token <token>', 'Hardcover API token')
   .option('-a, --api <url>', 'Hardcover API URL')
   .action(({db, output, token, api}) => {
-    if (db) {
+    if (typeof db !== 'undefined') {
       config.set('koboDbPath', db);
       console.log("Kobo database path saved");
     }
-    if (output) {
+    if (typeof output !== 'undefined') {
       config.set('annotationsFilePath', output);
       console.log("Annotations file path saved");
     }
-    if (token) {
+    if (typeof token !== 'undefined') {
       config.set('hardcoverApiToken', token);
       console.log("Hardcover API token saved");
     }
-    if (api) {
+    if (typeof api !== 'undefined') {
       config.set('hardcoverApiUrl', api);
       console.log("Hardcover API URL saved");
     }
@@ -36,14 +39,15 @@ program
 
 program
   .command("device")
-  .option('-i, --input <sqlite>','Kobo SQLite database', config.get('koboDbPath'))
-  .option('-o, --out <json>','Path for the annotations.json file to create or update', config.get('annotationsFilePath'))
+  .option('-i, --input <sqlite>','Kobo SQLite database. Leave blank for auto-detect.', config.get('koboDbPath'))
+  .option('-o, --out <json>','Path for the annotations.json file to create or update', ANNOTATION_PATH)
   .description("Read a Kobo sqlite database and extract all the annotations")
   .action(async ({input, out}) => {
+    const dbPath = input ? path.resolve(process.cwd(), input) : await detectKoboEreaderPath();
+
     try {
-      console.log("get annotations command called");
       await extractAnnotations({
-        dbPath: path.resolve(process.cwd(), input),
+        dbPath,
         outputFile: path.resolve(process.cwd(), out)
       });
     } catch (error) {
@@ -54,13 +58,12 @@ program
 
 program
   .command("hardcover")
-  .option('-i, --input <json>','Path for the annotations.json file to send from', config.get('annotationsFilePath'))
+  .option('-i, --input <json>','Path for the annotations.json file to send from', ANNOTATION_PATH)
   .option('-t, --token <token>', 'Hardcover API token', config.get('hardcoverApiToken'))
   .option('-a, --api <apiUrl>', 'Hardcover API url', config.get('hardcoverApiUrl'))
   .description("Send any updated annotations to Hardcover")
   .action(async ({input, token, api}) => {
     try {
-      console.log("send to hardcover command called");
       await syncAllAnnotations({
         annotationsFile: path.resolve(process.cwd(), input),
         apiToken: token,

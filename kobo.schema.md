@@ -1,4 +1,4 @@
-# Database Schema forKoboReader.sqlite
+# Database Schema for KoboReader.sqlite
 
 ## AbTest
 
@@ -15,7 +15,9 @@ CREATE TABLE AbTest(
   TestKey TEXT,
   PRIMARY KEY(Id))
 ```
-----------------------------------------
+
+---
+
 ## Achievement
 
 ```sql
@@ -39,7 +41,9 @@ CREATE TABLE Achievement(
   FacebookImageId TEXT,
   PRIMARY KEY (Id) )
 ```
-----------------------------------------
+
+---
+
 ## Activity
 
 ```sql
@@ -54,7 +58,9 @@ CREATE TABLE Activity (
   Type)
 )
 ```
-----------------------------------------
+
+---
+
 ## AnalyticsEvents
 
 ```sql
@@ -69,7 +75,9 @@ CREATE TABLE AnalyticsEvents(
   Mandatory BIT DEFAULT FALSE,
   PRIMARY KEY(Id))
 ```
-----------------------------------------
+
+---
+
 ## Authors
 
 ```sql
@@ -80,7 +88,9 @@ CREATE TABLE Authors(
   FacebookId TEXT,
   PRIMARY KEY(UserID))
 ```
-----------------------------------------
+
+---
+
 ## BookAuthors
 
 ```sql
@@ -90,7 +100,9 @@ CREATE TABLE BookAuthors(
   PRIMARY KEY(AuthorId,
   BookId))
 ```
-----------------------------------------
+
+---
+
 ## Bookmark
 
 ```sql
@@ -122,7 +134,9 @@ CREATE TABLE Bookmark (
   Color INTEGER DEFAULT 0,
   PRIMARY KEY (BookmarkID) )
 ```
-----------------------------------------
+
+---
+
 ## DbVersion
 
 ```sql
@@ -130,7 +144,9 @@ CREATE TABLE DbVersion(
   version INTEGER NOT NULL,
   PRIMARY KEY(version))
 ```
-----------------------------------------
+
+---
+
 ## DropboxItem
 
 ```sql
@@ -139,7 +155,9 @@ CREATE TABLE DropboxItem (
   Json TEXT,
   PRIMARY KEY (Id) )
 ```
-----------------------------------------
+
+---
+
 ## Event
 
 ```sql
@@ -154,7 +172,9 @@ CREATE TABLE Event (
   PRIMARY KEY (EventType,
   ContentID) )
 ```
-----------------------------------------
+
+---
+
 ## GDriveItem
 
 ```sql
@@ -164,7 +184,9 @@ CREATE TABLE GDriveItem (
   Path TEXT,
   PRIMARY KEY (Id) )
 ```
-----------------------------------------
+
+---
+
 ## KoboPlusAssetGroup
 
 ```sql
@@ -179,7 +201,9 @@ CREATE TABLE KoboPlusAssetGroup (
   Shown BOOL DEFAULT FALSE,
   PRIMARY KEY (Id) )
 ```
-----------------------------------------
+
+---
+
 ## KoboPlusAssets
 
 ```sql
@@ -194,7 +218,9 @@ CREATE TABLE KoboPlusAssets (
   Key,
   Language) )
 ```
-----------------------------------------
+
+---
+
 ## OverDriveCards
 
 ```sql
@@ -207,7 +233,9 @@ CREATE TABLE OverDriveCards (
   LastModified TEXT,
   PRIMARY KEY(CardId))
 ```
-----------------------------------------
+
+---
+
 ## OverDriveCheckoutBook
 
 ```sql
@@ -223,7 +251,9 @@ id TEXT,
   estimatedAvailableDate TEXT,
   PRIMARY KEY(id))
 ```
-----------------------------------------
+
+---
+
 ## OverDriveLibrary
 
 ```sql
@@ -234,7 +264,9 @@ Selected BIT NOT NULL DEFAULT false,
   Name TEXT,
   PRIMARY KEY(WebsiteId))
 ```
-----------------------------------------
+
+---
+
 ## Reviews
 
 ```sql
@@ -254,7 +286,9 @@ Id TEXT NOT NULL,
   Status TEXT,
   PRIMARY KEY(Id))
 ```
-----------------------------------------
+
+---
+
 ## Rules
 
 ```sql
@@ -271,7 +305,9 @@ CREATE TABLE Rules(
   Checksum TEXT,
   PRIMARY KEY(Id))
 ```
-----------------------------------------
+
+---
+
 ## Shelf
 
 ```sql
@@ -290,7 +326,9 @@ CREATE TABLE Shelf (
   PRIMARY KEY(Id)
 )
 ```
-----------------------------------------
+
+---
+
 ## ShelfContent
 
 ```sql
@@ -304,7 +342,9 @@ CREATE TABLE ShelfContent (
   ContentId)
 )
 ```
-----------------------------------------
+
+---
+
 ## SubscriptionProducts
 
 ```sql
@@ -318,7 +358,9 @@ CREATE TABLE SubscriptionProducts (
   DeactivationDate TEXT,
   PRIMARY KEY (CrossRevisionId) )
 ```
-----------------------------------------
+
+---
+
 ## SyncQueue
 
 ```sql
@@ -329,7 +371,9 @@ CREATE TABLE SyncQueue (
   PRIMARY KEY(VolumeId)
 )
 ```
-----------------------------------------
+
+---
+
 ## Tab
 
 ```sql
@@ -350,7 +394,9 @@ tabId TEXT NOT NULL,
   language TEXT,
   PRIMARY KEY(tabID))
 ```
-----------------------------------------
+
+---
+
 ## Wishlist
 
 ```sql
@@ -361,7 +407,9 @@ CREATE TABLE Wishlist(
   IsSynced BOOL,
   PRIMARY KEY(CrossRevisionId))
 ```
-----------------------------------------
+
+---
+
 ## WordList
 
 ```sql
@@ -372,7 +420,9 @@ CREATE TABLE WordList(
   DateCreated TEXT,
   PRIMARY KEY(Text))
 ```
-----------------------------------------
+
+---
+
 ## content
 
 ```sql
@@ -480,7 +530,9 @@ CREATE TABLE content(
   SyncConflictType INTEGER DEFAULT 0,
   PRIMARY KEY (ContentID)		)
 ```
-----------------------------------------
+
+---
+
 ## content_keys
 
 ```sql
@@ -491,7 +543,9 @@ CREATE TABLE content_keys (
   PRIMARY KEY (volumeId,
   elementId))
 ```
-----------------------------------------
+
+---
+
 ## content_settings
 
 ```sql
@@ -518,7 +572,9 @@ CREATE TABLE content_settings (
   PRIMARY KEY (ContentID,
   ContentType))
 ```
-----------------------------------------
+
+---
+
 ## ratings
 
 ```sql
@@ -529,7 +585,9 @@ CREATE TABLE ratings (
   DateModified TEXT NOT NULL,
   PRIMARY KEY(ContentID))
 ```
-----------------------------------------
+
+---
+
 ## shortcover_page
 
 ```sql
@@ -540,7 +598,9 @@ CREATE TABLE shortcover_page (
   PRIMARY KEY (shortcoverId,
   PageNumber))
 ```
-----------------------------------------
+
+---
+
 ## user
 
 ```sql
@@ -576,7 +636,9 @@ CREATE TABLE user(
   NotebookSyncToken TEXT,
   PRIMARY KEY (UserID))
 ```
-----------------------------------------
+
+---
+
 ## volume_shortcovers
 
 ```sql
@@ -587,7 +649,9 @@ CREATE TABLE volume_shortcovers(
   PRIMARY KEY (volumeId,
   shortcoverId))
 ```
-----------------------------------------
+
+---
+
 ## volume_tabs
 
 ```sql
@@ -597,4 +661,5 @@ CREATE TABLE volume_tabs (
   PRIMARY KEY (volumeId,
   tabId))
 ```
-----------------------------------------
+
+---
