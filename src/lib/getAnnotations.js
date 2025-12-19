@@ -1,4 +1,3 @@
-import sqlite from "node:sqlite";
 import fs from "node:fs/promises";
 /**
  * Fetches annotations from the Kobo database, including highlights
@@ -65,8 +64,8 @@ export default async function extractAnnotations({
     // If file doesn't exist or is invalid, we'll start with an empty array
     console.warn(`Creating a new annotations file.`);
   }
-
-  const db = new sqlite.DatabaseSync(dbPath);
+  const sqlite = await import("node:sqlite");
+  const db = new sqlite.default.DatabaseSync(dbPath);
   const myNotes = getAnnotations(db, since);
 
   // Merge and De-duplicate
