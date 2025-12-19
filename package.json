@@ -29,7 +29,7 @@
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "kobo-sync": "src/index.js"
+    "kobo-sync": "bin/kobo-sync.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
