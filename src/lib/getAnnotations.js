@@ -68,6 +68,12 @@ export default async function extractAnnotations({
   const db = new sqlite.default.DatabaseSync(dbPath);
   const myNotes = getAnnotations(db, since);
 
+  // Create a set of existing annotation IDs for quick lookup
+  const existingIds = new Set(existingNotes.map((note) => note.id));
+
+  // Filter to find only NEW annotations (ones that don't exist in the file yet)
+  const newNotes = myNotes.filter((note) => !existingIds.has(note.id));
+
   // Merge and De-duplicate
   // We create a Map using the 'id' as the key.
   // New notes will overwrite existing ones if the ID matches (useful if you updated a note).
@@ -85,8 +91,6 @@ export default async function extractAnnotations({
   );
 
   await fs.writeFile(outputFile, JSON.stringify(finalData, null, 2));
-  console.log(
-    `Extracted ${myNotes.length} annotations and merged with existing data.`
-  );
+  console.log(`Found ${myNotes.length} annotations (${newNotes.length} new).`);
   return finalData;
 }
