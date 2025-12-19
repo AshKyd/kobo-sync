@@ -1,6 +1,6 @@
 {
   "name": "kobo-sync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": " A command line tool to download your highlights from your Kobo device over USB and optionally sync them to your hardcover.app reading journal. ",
   "license": "ISC",
   "author": {
