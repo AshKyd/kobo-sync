@@ -1,9 +1,31 @@
 {
   "name": "kobo-sync",
   "version": "1.0.0",
-  "description": "",
+  "description": " A command line tool to download your highlights from your Kobo device over USB and optionally sync them to your hardcover.app reading journal. ",
   "license": "ISC",
-  "author": "",
+  "author": {
+    "name": "Ash Kyd",
+    "email": "ash@kyd.com.au",
+    "url": "https://ashk.au/"
+  },
+  "homepage": "https://github.com/ashkyd/kobo-sync",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:AshKyd/kobo-sync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/oashkyd/kobo-sync/issues"
+  },
+  "keywords": [
+    "kobo",
+    "annotations",
+    "highlights",
+    "hardcover",
+    "ebook",
+    "reader",
+    "cli",
+    "sync"
+  ],
   "type": "module",
   "main": "src/index.js",
   "scripts": {
