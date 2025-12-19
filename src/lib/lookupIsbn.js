@@ -15,7 +15,7 @@ const normalize = (str) => {
 
 /**
  * Finds the best book match in the user's library using a scoring system.
- * Prevents "Iris" from matching "Shadow of Iris" by checking word coverage.
+ * Prevents "Iris" from matching "The Wild Iris" by checking word coverage.
  */
 function findBookInLibrary(koboTitle, library) {
   const target = normalize(koboTitle);
@@ -84,7 +84,6 @@ export default async function lookupISBN(koboAnnotation, { apiToken, apiUrl }) {
     apiUrl
   });
 
-  // If result is null, an error occurred and was already logged
   if (result === null) {
     throw new Error("Failed to fetch library from Hardcover API");
   }

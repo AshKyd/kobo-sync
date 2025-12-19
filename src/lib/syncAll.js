@@ -7,7 +7,6 @@ export default async function syncAllAnnotations({
   apiToken = '',
   apiUrl = ''
 }) {
-  // Validate required parameters
   if (!apiToken) {
     throw new Error("Hardcover API token is required");
   }
@@ -77,7 +76,6 @@ export default async function syncAllAnnotations({
     }
   }
 
-  // 6. Save once at the end (or every X items) to protect disk I/O
   await fs.writeFile(annotationsFile, JSON.stringify(annotations, null, 2));
   console.log("\nSync job complete. File updated.");
   return annotations;

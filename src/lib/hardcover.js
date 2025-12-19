@@ -9,7 +9,6 @@
  * @returns {Promise<Object|null>} The API response data or null if an error occurred
  */
 export async function hardcoverApiRequest({ query, variables = {}, apiToken, apiUrl }) {
-  // Validate required parameters
   if (!apiToken) {
     throw new Error("API token is required");
   }
@@ -45,13 +44,11 @@ export async function hardcoverApiRequest({ query, variables = {}, apiToken, api
     return null;
   }
 
-  // Handle API errors by logging them and returning null
   if (result.errors) {
     console.error("Hardcover API errors:", JSON.stringify(result.errors, null, 2));
     return null;
   }
 
-  // Handle HTTP errors (but still return the parsed result if it has data)
   if (!response.ok) {
     console.error(`Hardcover API request failed with status ${response.status}: ${response.statusText}`);
     return null;

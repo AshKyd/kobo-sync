@@ -1,8 +1,5 @@
 import hardcoverApiRequest from './hardcover.js';
 
-/**
- * 1. Find Hardcover IDs using ISBN
- */
 async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
   if (!isbn || isbn === "No ISBN") return null;
 
@@ -23,7 +20,6 @@ async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
     apiUrl
   });
 
-  // If result is null, an error occurred and was already logged
   if (result === null) {
     throw new Error("Failed to fetch book IDs from Hardcover API");
   }
@@ -32,9 +28,6 @@ async function getHardcoverIds(isbn, { apiToken, apiUrl }) {
   return book ? { bookId: book.id, editionId: book.editions[0].id } : null;
 }
 
-/**
- * 2. Sync Annotation
- */
 export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl }) {
   if (!koboAnnotation) {
     throw new Error("Kobo annotation is required");
@@ -78,7 +71,6 @@ export default async function syncAnnotation(koboAnnotation, { apiToken, apiUrl 
     apiUrl
   });
 
-  // If result is null, an error occurred and was already logged
   if (result === null) {
     throw new Error("Failed to sync annotation with Hardcover API");
   }

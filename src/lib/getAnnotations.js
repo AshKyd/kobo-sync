@@ -49,7 +49,6 @@ export default async function extractAnnotations({
   outputFile = "",
   since = "1970-01-01"
 }) {
-  // Validate required parameters
   if (!dbPath) {
     throw new Error("Database path is required");
   }
@@ -70,7 +69,7 @@ export default async function extractAnnotations({
   const db = new sqlite.DatabaseSync(dbPath);
   const myNotes = getAnnotations(db, since);
 
-  // 3. Merge and De-duplicate
+  // Merge and De-duplicate
   // We create a Map using the 'id' as the key.
   // New notes will overwrite existing ones if the ID matches (useful if you updated a note).
   const mergedMap = new Map();
@@ -81,7 +80,7 @@ export default async function extractAnnotations({
   // Load old notes into the map
   existingNotes.forEach(note => mergedMap.set(note.id, note));
 
-  // 4. Convert back to array and sort by time (newest first)
+  // Convert back to array and sort by time (newest first)
   const finalData = Array.from(mergedMap.values())
     .sort((a, b) => new Date(b.time) - new Date(a.time));
   
