@@ -4,33 +4,35 @@ import fs from "node:fs/promises";
  * from books that have been returned or deleted.
  */
 function getAnnotations(db, since = "1970-01-01") {
+  /*
+   * b = Bookmark (The highlights & notes)
+   * c = content  (Book-level metadata like Title/ISBN)
+   * v = content  (Volume/Chapter-level metadata)
+   * o = OverDriveCheckoutBook (Library book metadata fallback)
+   */
   const sql = `
     SELECT 
       b.BookmarkID as id,
-      -- Extract a title from the VolumeID path if the content table row is gone
-      COALESCE(
-        c_book.Title, 
-        od.title, 
-        REPLACE(REPLACE(b.VolumeID, 'file:///mnt/onboard/', ''), '.epub', '')
-      ) as title,
-      COALESCE(c_book.ISBN, 'No ISBN') as isbn,
+      COALESCE(c.Title, o.title) as title,
+      c.ISBN as isbn,
       b.DateCreated as time,
-      COALESCE(c_chapter.Title, 'Unknown Chapter') as chapter,
+      v.Title as chapter,
       b.Annotation as annotation,
       b.Text as highlightedText
     FROM Bookmark b
-    -- Use a LEFT JOIN on a substring match for VolumeID 
-    -- This fixes cases where Bookmark has a URL but Content has a filename
-    LEFT JOIN content c_book 
-      ON b.VolumeID = c_book.ContentID 
-      OR b.VolumeID LIKE '%' || c_book.ContentID
-    LEFT JOIN content c_chapter 
-      ON b.ContentID = c_chapter.ContentID
-    LEFT JOIN OverDriveCheckoutBook od 
-      ON b.VolumeID = od.id
+    -- Join for Book Title: Matches VolumeID to root content record
+    LEFT JOIN content c 
+      ON b.VolumeID = c.ContentID 
+      OR b.VolumeID LIKE '%' || c.ContentID
+    -- Join for Chapter: Matches ContentID to specific section record
+    LEFT JOIN content v 
+      ON b.ContentID = v.ContentID
+    -- Join for Library Books: Fallback for OverDrive titles
+    LEFT JOIN OverDriveCheckoutBook o 
+      ON b.VolumeID = o.id
     WHERE b.DateCreated >= ?
-      -- We check for both Text and Annotation to catch 'empty' bookmarks
-      AND (b.Text IS NOT NULL OR b.Annotation IS NOT NULL OR b.Type = 'highlight')
+      AND b.Text IS NOT NULL 
+      AND b.Text != ''
     ORDER BY b.DateCreated DESC
   `;
 
