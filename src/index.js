@@ -37,13 +37,13 @@ program
   .option('-j, --json <path>', 'Path for the annotations.json file')
   .option('-t, --token <token>', 'Hardcover API token')
   .option('-a, --api <url>', 'Hardcover API URL')
-  .action(({db, output, token, api}) => {
+  .action(({db, json, token, api}) => {
     if (typeof db !== 'undefined') {
       config.set('koboDbPath', db||schema.koboDbPath.default);
       console.log("Kobo database path saved");
     }
-    if (typeof output !== 'undefined') {
-      config.set('annotationsFilePath', output||schema.annotationsFilePath.default);
+    if (typeof json !== 'undefined') {
+      config.set('annotationsFilePath', json||schema.annotationsFilePath.default);
       console.log("Annotations file path saved");
     }
     if (typeof token !== 'undefined') {
