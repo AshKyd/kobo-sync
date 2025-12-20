@@ -50,49 +50,32 @@ export default async function extractAnnotations({
   outputFile = "",
   since = "1970-01-01",
 }) {
-  if (!dbPath) {
-    throw new Error("Database path is required");
-  }
-
-  if (!outputFile) {
-    throw new Error("Output file path is required");
-  }
+  if (!dbPath || !outputFile) throw new Error("Paths are required");
 
   let existingNotes = [];
   try {
-    const fileContent = await fs.readFile(outputFile, "utf8");
-    existingNotes = JSON.parse(fileContent);
-  } catch (error) {
-    // If file doesn't exist or is invalid, we'll start with an empty array
+    existingNotes = JSON.parse(await fs.readFile(outputFile, "utf8"));
+  } catch (e) {
     console.warn(`Creating a new annotations file.`);
   }
+
   const sqlite = await import("node:sqlite");
   const db = new sqlite.default.DatabaseSync(dbPath);
   const myNotes = getAnnotations(db, since);
 
-  // Create a set of existing annotation IDs for quick lookup
-  const existingIds = new Set(existingNotes.map((note) => note.id));
+  const myNotesIds = new Set(myNotes.map((n) => n.id));
+  const existingIds = new Set(existingNotes.map((n) => n.id));
+  const newItems = myNotes.filter((n) => !existingIds.has(n.id));
 
-  // Filter to find only NEW annotations (ones that don't exist in the file yet)
-  const newNotes = myNotes.filter((note) => !existingIds.has(note.id));
-
-  // Merge and De-duplicate
-  // We create a Map using the 'id' as the key.
-  // New notes will overwrite existing ones if the ID matches (useful if you updated a note).
-  const mergedMap = new Map();
-
-  // Add new notes into the map (overwriting duplicates)
-  myNotes.forEach((note) => mergedMap.set(note.id, note));
-
-  // Load old notes into the map
-  existingNotes.forEach((note) => mergedMap.set(note.id, note));
-
-  // Convert back to array and sort by time (newest first)
-  const finalData = Array.from(mergedMap.values()).sort(
-    (a, b) => new Date(b.time) - new Date(a.time)
-  );
+  const finalData = [
+    ...existingNotes.map((n) => ({
+      ...n,
+      existsOnDevice: myNotesIds.has(n.id),
+    })),
+    ...newItems.map((n) => ({ ...n, existsOnDevice: true })),
+  ].sort((a, b) => new Date(b.time) - new Date(a.time));
 
   await fs.writeFile(outputFile, JSON.stringify(finalData, null, 2));
-  console.log(`Found ${myNotes.length} annotations (${newNotes.length} new).`);
+  console.log(`Found ${myNotes.length} notes (${newItems.length} new).`);
   return finalData;
 }
